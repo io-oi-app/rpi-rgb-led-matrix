@@ -439,6 +439,28 @@ protected:
   }
 };
 
+
+/***
+ * for P5Outdoor LED scan8 based CheckeredMultiplexMapper
+ * @auther kao@io-oi.jp
+ * @since 2021-07-04
+ */
+class P5OutdoorScan8MultiplexMapper : public MultiplexMapperBase {
+public:
+  P5OutdoorScan8MultiplexMapper() : MultiplexMapperBase("P5OutdoorScan8", 2) {}
+
+  void MapSinglePanel(int x, int y, int *matrix_x, int *matrix_y) const {
+    const bool is_top_check = (y % (panel_rows_/2)) < panel_rows_/4;
+    const bool is_left_check = (x < panel_cols_/2);
+    if (is_top_check) {
+      *matrix_x = is_left_check ? x : x + panel_cols_;
+    } else {
+      *matrix_x =  x+panel_cols_/2;
+    }
+    *matrix_y = ((y / (panel_rows_/2)) * (panel_rows_/4)
+                 + y % (panel_rows_/4));
+  }
+};
 /*
  * Here is where the registration happens.
  * If you add an instance of the mapper here, it will automatically be
@@ -465,6 +487,8 @@ static MuxMapperList *CreateMultiplexMapperList() {
   result->push_back(new P10CoremanMapper());
   result->push_back(new P8Outdoor1R1G1BMultiplexMapper());
   result->push_back(new FlippedStripeMultiplexMapper());
+  // added on 2021-07-04 by kao
+  result->push_back(new P5OutdoorScan8MultiplexMapper());
   return result;
 }
 
